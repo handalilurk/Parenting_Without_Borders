@@ -17,6 +17,23 @@ else:
 genai.configure(api_key=API_KEY)
 MODEL_NAME = "gemini-2.5-flash"
 
+import streamlit as st
+import google.generativeai as genai
+from PIL import Image
+
+# ==========================================
+# 1. 기본 설정
+# ==========================================
+
+# [보안] API 키 입력
+if "GOOGLE_API_KEY" in st.secrets:
+    API_KEY = st.secrets["GOOGLE_API_KEY"]
+else:
+    # 로컬 테스트용 (배포 전에는 여기에 직접 키를 넣어서 테스트 가능)
+    API_KEY = "여기에_새로_발급받은_API_키를_넣으세요"
+
+genai.configure(api_key=API_KEY)
+MODEL_NAME = "gemini-1.5-flash"
 
 st.set_page_config(
     page_title="Parenting Without Borders",
@@ -40,14 +57,12 @@ if "Dark" in theme_mode:
     card_bg = "#262730"
     border_color = "#374151"
     header_bg = "#312E81"
-    sub_text = "#9CA3AF"
 else:
     bg_color = "#F3F4F6"
     text_color = "#1F2937"
     card_bg = "#FFFFFF"
     border_color = "#E5E7EB"
     header_bg = "#4F46E5"
-    sub_text = "#E0E7FF"
 
 st.markdown(f"""
     <style>
@@ -58,7 +73,7 @@ st.markdown(f"""
     
     .custom-header {{
         background-color: {header_bg};
-        padding: 3rem 1rem;
+        padding: 2rem 1rem; /* 모바일 공간 확보를 위해 패딩 약간 축소 */
         text-align: center;
         margin-top: -50px;
         margin-left: -5rem;
@@ -67,8 +82,24 @@ st.markdown(f"""
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }}
     
-    .custom-header h1 {{ color: white !important; font-weight: 700; font-size: 2.5rem; margin-bottom: 0.5rem; }}
-    .custom-header p {{ color: #E0E7FF !important; font-size: 1.1rem; }}
+    /* [수정된 부분] 모바일 대응 타이틀 스타일 */
+    .custom-header h1 {{
+        color: white !important;
+        font-weight: 700;
+        /* clamp(최소크기, 권장크기, 최대크기) -> 화면 폭에 따라 글자 크기가 변함 */
+        font-size: clamp(1.8rem, 5vw, 2.5rem); 
+        margin-bottom: 0.5rem;
+        /* 화면이 좁으면 자동으로 줄바꿈 허용 */
+        white-space: normal;
+        word-wrap: break-word;
+        line-height: 1.2; /* 줄바꿈 됐을 때 간격 조정 */
+    }}
+    
+    .custom-header p {{
+        color: #E0E7FF !important;
+        font-size: 1.0rem;
+        padding: 0 10px; /* 모바일에서 텍스트가 화면 끝에 붙지 않게 여백 줌 */
+    }}
 
     div[data-testid="stFileUploader"] {{
         border: 2px dashed {header_bg};
@@ -102,7 +133,6 @@ with st.container():
     col1, col2 = st.columns(2)
     with col1:
         st.markdown(f"**🟣 Parent Language (Output)**")
-        # [업데이트] 아랍어(Arabic)와 터키어(Turkish) 모두 추가 완료
         parent_lang = st.selectbox(
             "Select Parent Language", 
             [
@@ -176,3 +206,5 @@ with st.container():
             except Exception as e:
                 status_text.error("❌ Error Occurred")
                 st.error(f"Details: {e}")
+
+
