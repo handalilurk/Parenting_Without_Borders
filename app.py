@@ -18,7 +18,7 @@ else:
 
 genai.configure(api_key=API_KEY)
 
-# 모델 설정: Gemini 2.5 Flash 적용
+# 모델 설정
 MODEL_NAME = "gemini-2.5-flash" 
 
 st.set_page_config(
@@ -33,9 +33,7 @@ st.set_page_config(
 def get_gemini_response(image, parent_lang, homework_lang):
     """
     Generates a coaching guide using Gemini 2.5 Flash.
-    System instructions are in English for better global performance.
     """
-    
     prompt = f"""
     ### Role & Objective
     You are the **Lead AI Tutor** for the app "Super Parents".
@@ -45,30 +43,16 @@ def get_gemini_response(image, parent_lang, homework_lang):
     Analyze the provided homework image and generate a structured guide.
     **The final output must be written entirely in {parent_lang}.**
 
-    ### Output Format (Please follow this structure)
-    
+    ### Output Format
     1. **🎯 Homework Overview (1-Sentence Summary)**
-       - Briefly explain the core learning objective of this assignment to the parent.
-    
     2. **🗣️ Coaching Guide (Conversational Scripts)**
-       - Provide specific dialogue/scripts the parent can say to the child.
-       - Do NOT just give the answers. Instead, provide **guiding questions** to stimulate the child's thinking.
-       - (e.g., "Ask your child: 'What do you think happens if we add these two numbers?'")
-
     3. **📝 Essential Vocabulary (Table Format)**
-       - Select 3-5 key terms from the homework image.
-       - Columns: [Original Word] | [Pronunciation (written in {parent_lang})] | [Meaning in {parent_lang}]
-
     4. **💡 Teacher's Pro Tip**
-       - Explain the underlying concept, formula, or cultural context simply.
-       - Mention common mistakes or traps students often fall into.
 
     ### Tone & Style
-    - Professional, supportive, and encouraging (like a kind teacher).
-    - Use clear **Markdown** (Bold, Tables, Lists) for readability.
-    - **CRITICAL:** Regardless of the input language, your entire response must be in **{parent_lang}**.
+    - Professional, supportive, and encouraging.
+    - Use clear Markdown.
     """
-    
     try:
         model = genai.GenerativeModel(MODEL_NAME)
         content_input = [prompt, image[0]] if isinstance(image, list) else [prompt, image]
@@ -89,7 +73,7 @@ with st.sidebar:
     st.markdown("Developed with Google Gemini")
     st.caption("⚠️ AI can make mistakes. Please verify important information.")
 
-# 색상 설정
+# 색상 변수 설정
 if "Dark" in theme_mode:
     bg_color = "#0E1117"
     text_color = "#FAFAFA"
@@ -105,7 +89,10 @@ else:
     header_bg = "#4F46E5" 
     sub_text = "#6B7280"
 
-# [중요] HTML 들여쓰기를 완전히 제거하여 문자열 생성
+# ---------------------------------------------------------
+# [수정 핵심] HTML 문자열 생성
+# 색상을 !important로 강제하여 Streamlit 기본 테마를 덮어씁니다.
+# ---------------------------------------------------------
 html_code = f"""
 <style>
     .stApp {{ background-color: {bg_color} !important; }}
@@ -114,6 +101,7 @@ html_code = f"""
     }}
     header {{visibility: hidden;}}
     
+    /* 헤더 박스 스타일 */
     .custom-header {{
         background-color: {header_bg};
         padding: 2rem 1rem;
@@ -125,11 +113,12 @@ html_code = f"""
         box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }}
     
+    /* 타이틀 스타일 */
     .custom-header h1 {{
-        color: #FFFFFF !important;
+        color: #FFFFFF !important; /* 흰색 강제 */
         font-family: sans-serif;
         font-weight: 800;
-        font-size: clamp(1.6rem, 6vw, 2.5rem);
+        font-size: clamp(1.8rem, 6vw, 2.5rem);
         margin-top: 10px;
         margin-bottom: 15px;
         line-height: 1.2;
@@ -162,15 +151,32 @@ html_code = f"""
 </style>
 
 <div class="custom-header">
-<div style="font-size: 3rem; margin-bottom: 0;">🦸‍♂️ ♡ 🦸‍♀️</div>
-<h1>Super Parents<br>Heroes Without Borders</h1>
-<p style="color: #FFD700; font-size: 1.2rem; font-weight: 700; margin-bottom: 10px; text-shadow: 0px 1px 3px rgba(0,0,0,0.5);">
-You remain your child's first and best teacher.
-</p>
-<p style="color: #FFFFFF; font-size: 1.0rem; font-weight: 400; line-height: 1.5; margin-top: 0; opacity: 0.95;">
-Understand in your language, teach with confidence.<br>
-Let your wisdom cross the language barrier.
-</p>
+    <div style="font-size: 3rem; margin-bottom: 0;">🦸‍♂️ ♡ 🦸‍♀️</div>
+    
+    <h1>Super Parents<br>Heroes Without Borders</h1>
+    
+    <p style="
+        color: #FFD700 !important; 
+        font-size: 1.25rem !important; 
+        font-weight: 800 !important; 
+        margin-bottom: 10px !important; 
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.5) !important;
+        opacity: 1 !important;
+    ">
+        You remain your child's first and best teacher.
+    </p>
+
+    <p style="
+        color: #FFFFFF !important; 
+        font-size: 1.0rem !important; 
+        font-weight: 500 !important; 
+        line-height: 1.5 !important; 
+        margin-top: 0 !important; 
+        opacity: 0.95 !important;
+    ">
+        Understand in your language, teach with confidence.<br>
+        Let your wisdom cross the language barrier.
+    </p>
 </div>
 """
 
