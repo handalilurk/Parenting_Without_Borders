@@ -119,51 +119,31 @@ st.markdown(f"""
         color: {text_color} !important; 
     }}
 
-    /* 헤더 숨김 */
+    /* 기본 헤더 숨김 */
     header {{visibility: hidden;}}
 
     /* 커스텀 헤더 컨테이너 */
     .custom-header {{
         background-color: {header_bg};
-        padding: 2rem 1rem; /* 모바일 여백 최적화 */
+        padding: 2rem 1rem;
         text-align: center;
-        margin-top: -60px; /* 상단 빈 공간 제거 */
+        margin-top: -60px;
         margin-left: -5rem;
         margin-right: -5rem;
         margin-bottom: 2rem;
         box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }}
 
-    /* 헤더 타이틀 (Super Parents...) */
+    /* 헤더 타이틀 */
     .custom-header h1 {{
         color: #FFFFFF !important;
         font-family: sans-serif;
         font-weight: 800;
-        font-size: clamp(1.5rem, 6vw, 2.5rem); /* 모바일에서 글자 크기 자동 조절 */
+        font-size: clamp(1.6rem, 6vw, 2.5rem);
         margin-top: 10px;
         margin-bottom: 15px;
         line-height: 1.2;
         text-shadow: 0px 2px 4px rgba(0,0,0,0.2);
-    }}
-
-    /* 서브타이틀 1 (You remain...) */
-    .header-main-sub {{
-        font-size: 1.1rem;
-        font-weight: 600;
-        color: #FFFFFF !important; /* 강제 흰색 */
-        margin-bottom: 5px;
-        opacity: 0.95;
-        padding: 0 10px;
-    }}
-
-    /* 서브타이틀 2 (Understand in your language...) */
-    .header-sub {{
-        font-size: 0.9rem;
-        color: #E0E7FF !important; /* 연한 보라/흰색 */
-        font-weight: 400;
-        line-height: 1.4;
-        padding: 0 15px;
-        opacity: 0.9;
     }}
 
     /* 파일 업로더 박스 디자인 */
@@ -195,13 +175,17 @@ st.markdown(f"""
 </style>
 
 <div class="custom-header">
-<div style="font-size: 3rem; margin-bottom: 0;">🦸‍♂️ ♡ 🦸‍♀️</div>
-<h1>Super Parents<br>Heroes Without Borders</h1>
-<p class="header-main-sub">You remain your child's first and best teacher.</p>
-<p class="header-sub">
-Understand in your language, teach with confidence.<br>
-Let your wisdom cross the language barrier.
-</p>
+    <div style="font-size: 3rem; margin-bottom: 0;">🦸‍♂️ ♡ 🦸‍♀️</div>
+    <h1>Super Parents<br>Heroes Without Borders</h1>
+    
+    <p style="color: #FFD700; font-size: 1.2rem; font-weight: 700; margin-bottom: 10px; text-shadow: 0px 1px 3px rgba(0,0,0,0.5);">
+        You remain your child's first and best teacher.
+    </p>
+
+    <p style="color: #FFFFFF; font-size: 1.0rem; font-weight: 400; line-height: 1.5; margin-top: 0; opacity: 0.95;">
+        Understand in your language, teach with confidence.<br>
+        Let your wisdom cross the language barrier.
+    </p>
 </div>
 """, unsafe_allow_html=True)
 
