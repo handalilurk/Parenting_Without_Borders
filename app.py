@@ -22,8 +22,8 @@ genai.configure(api_key=API_KEY)
 MODEL_NAME = "gemini-2.5-flash" 
 
 st.set_page_config(
-    page_title="Parenting Without Borders",
-    page_icon="♡",
+    page_title="Super Parents: Heroes Without Borders", # 페이지 탭 이름도 변경
+    page_icon="🦸", # 아이콘 변경
     layout="centered"
 )
 
@@ -39,7 +39,7 @@ def get_gemini_response(image, parent_lang, homework_lang):
     # 프롬프트 지시문을 전면 영어로 변경 (모델 이해도 상승)
     prompt = f"""
     ### Role & Objective
-    You are the **Lead AI Tutor** for the app "Parenting Without Borders".
+    You are the **Lead AI Tutor** for the app "Super Parents".
     Your goal is to empower a parent who speaks **[ {parent_lang} ]** to perfectly understand and guide their child's homework (originally in **[ {homework_lang} ]**).
 
     ### Instructions
@@ -97,14 +97,14 @@ if "Dark" in theme_mode:
     text_color = "#FAFAFA"
     card_bg = "#262730"
     border_color = "#374151"
-    header_bg = "#312E81"
+    header_bg = "#312E81" # 어두운 모드 헤더색 유지
     sub_text = "#D1D5DB" 
 else:
     bg_color = "#F3F4F6"
     text_color = "#1F2937"
     card_bg = "#FFFFFF"
     border_color = "#E5E7EB"
-    header_bg = "#4F46E5"
+    header_bg = "#4F46E5" # 밝은 모드: 인디고 퍼플 계열 (슈퍼히어로 느낌)
     sub_text = "#6B7280"
 
 st.markdown(f"""
@@ -116,7 +116,7 @@ st.markdown(f"""
     
     .custom-header {{
         background-color: {header_bg};
-        padding: 2rem 1rem;
+        padding: 2.5rem 1rem; /* 상하 패딩 약간 증가 */
         text-align: center;
         margin-top: -50px;
         margin-left: -5rem;
@@ -127,17 +127,27 @@ st.markdown(f"""
     
     .custom-header h1 {{
         color: white !important;
-        font-weight: 700;
-        font-size: clamp(1.8rem, 5vw, 2.5rem); 
+        font-weight: 800; /* 폰트 더 두껍게 */
+        font-size: clamp(2.0rem, 5vw, 2.8rem); /* 타이틀 크기 증가 */
         margin-bottom: 0.5rem;
         white-space: normal;
         word-wrap: break-word;
         line-height: 1.2;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3); /* 슈퍼히어로 느낌의 그림자 추가 */
     }}
     
-    .custom-header p {{
+    /* 서브타이틀 스타일 강화 */
+    .header-main-sub {{
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #FFFFFF !important;
+        margin-bottom: 0.8rem;
+    }}
+
+    .header-sub {{
         color: #E0E7FF !important;
-        font-size: 1.0rem;
+        font-size: 1.05rem;
+        line-height: 1.5;
         padding: 0 10px;
     }}
 
@@ -169,9 +179,16 @@ st.markdown(f"""
     </style>
     
     <div class="custom-header">
-        <div style="font-size: 3rem; margin-bottom: 10px;">📖 ♡ 文</div>
-        <h1>Parenting Without Borders</h1>
-        <p>Global Parenting Support<br>Translate & Guide Homework in Your Language</p>
+        <div style="font-size: 3rem; margin-bottom: 10px;">🦸‍♂️ ♡ 🦸‍♀️</div>
+        <h1>Super Parents: Heroes Without Borders</h1>
+        
+        <p class="header-main-sub">
+            You remain your child's first and best teacher.
+        </p>
+        <p class="header-sub">
+            Understand in your language, teach with confidence.<br>
+            Let your wisdom cross the language barrier and reach your child.
+        </p>
     </div>
 """, unsafe_allow_html=True)
 
@@ -204,6 +221,7 @@ with st.container():
                 "Thai (ภาษาไทย)", 
                 "Vietnamese (Tiếng Việt)"
             ], 
+            index=0, # 기본값 English로 설정 (글로벌 타겟)
             label_visibility="collapsed"
         )
     with col2:
@@ -211,13 +229,13 @@ with st.container():
         target_lang = st.selectbox(
             "Select Homework Language", 
             ["Dutch", "English", "German", "French", "Spanish", "Chinese", "Auto Detect"], 
+            index=0, # 기본값 Dutch (현재 타겟)
             label_visibility="collapsed"
         )
 
     st.markdown("---")
     
-    # [변경] 탭 제거 -> 단일 업로드 버튼으로 통합
-    # 모바일에서는 이 버튼 하나로 '사진 찍기'와 '앨범 선택'이 모두 가능합니다.
+    # 단일 업로드 버튼
     st.markdown("### 📸 Upload Homework")
     st.caption("Tap 'Browse files' below to take a photo or choose from gallery.")
     
@@ -236,11 +254,12 @@ with st.container():
         
         st.markdown("###") 
         
-        submit = st.button("🚀 Translate & Explain", type="primary", use_container_width=True)
+        # 버튼 문구도 약간 더 힘있게 변경
+        submit = st.button("🚀 Activate Super Parent Mode", type="primary", use_container_width=True)
 
         if submit:
             status_text = st.empty()
-            status_text.info("🤖 AI Tutor is analyzing... Please wait.")
+            status_text.info("🤖 AI is preparing your coaching guide...")
             
             # 언어 텍스트 정리 (괄호 제거 등)
             p_lang_clean = parent_lang.split("(")[0].strip()
@@ -253,15 +272,14 @@ with st.container():
                 status_text.error("❌ Error Occurred")
                 st.error(response_text)
             else:
-                status_text.success("✅ Analysis Complete!")
-                st.markdown("### 🎉 Analysis Result")
+                status_text.success("✅ Ready to teach! (코칭 준비 완료!)")
+                st.markdown("### 🎉 Your Coaching Guide")
                 st.markdown(f'<div class="result-box">{response_text}</div>', unsafe_allow_html=True)
                 
                 # 면책 조항
                 st.markdown("""
                     <div class="disclaimer">
-                        ⚠️ <b>Disclaimer:</b> This service uses Artificial Intelligence. 
-                        Results may be inaccurate or incomplete. Please use this for reference only 
-                        and verify important information with school materials.
+                        ⚠️ <b>Disclaimer:</b> This tool supports parents but does not replace teachers.
+                        Results by AI may vary. Always verify with official school materials.
                     </div>
                 """, unsafe_allow_html=True)
