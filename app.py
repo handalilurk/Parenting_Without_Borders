@@ -1,7 +1,6 @@
 import streamlit as st
 import google.generativeai as genai
 from PIL import Image
-import textwrap # [핵심] 들여쓰기 문제를 해결하는 라이브러리
 
 # ==========================================
 # 1. 기본 설정
@@ -25,7 +24,7 @@ st.set_page_config(
 )
 
 # ==========================================
-# [AI Function] 응답 생성 함수
+# [AI Function]
 # ==========================================
 def get_gemini_response(image, parent_lang, homework_lang):
     prompt = f"""
@@ -56,7 +55,7 @@ def get_gemini_response(image, parent_lang, homework_lang):
         return f"Error occurred during analysis: {e}"
 
 # ==========================================
-# 2. 테마 및 디자인 (CSS & Header)
+# 2. 테마 및 디자인 (절대 깨지지 않는 방식)
 # ==========================================
 
 with st.sidebar:
@@ -64,99 +63,77 @@ with st.sidebar:
     theme_mode = st.selectbox("Theme Mode", ["Light Mode (Default)", "Dark Mode"])
     st.divider()
     st.markdown("Developed with Google Gemini")
-    st.caption("⚠️ AI can make mistakes. Please verify.")
 
-# 색상 변수 설정
 if "Dark" in theme_mode:
     bg_color = "#0E1117"
     text_color = "#FAFAFA"
     card_bg = "#262730"
     border_color = "#374151"
     header_bg = "#312E81" 
-    sub_text = "#D1D5DB" 
 else:
     bg_color = "#F3F4F6"
     text_color = "#1F2937"
     card_bg = "#FFFFFF"
     border_color = "#E5E7EB"
     header_bg = "#4F46E5" 
-    sub_text = "#6B7280"
 
-# ---------------------------------------------------------
-# [문제 해결] textwrap.dedent를 사용하여 
-# 파이썬 들여쓰기를 무시하고 HTML을 렌더링합니다.
-# ---------------------------------------------------------
-html_design = textwrap.dedent(f"""
-    <style>
-        .stApp {{ background-color: {bg_color} !important; }}
-        .stMarkdown, .stMarkdown p, .stMarkdown h1, .stMarkdown h2, .stMarkdown h3, .stMarkdown li, .stMarkdown span {{ 
-            color: {text_color} !important; 
-        }}
-        header {{visibility: hidden;}}
-        
-        .custom-header {{
-            background-color: {header_bg};
-            padding: 2rem 1rem;
-            text-align: center;
-            margin-top: -60px;
-            margin-left: -5rem;
-            margin-right: -5rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }}
-        
-        .custom-header h1 {{
-            color: #FFFFFF !important;
-            font-family: sans-serif;
-            font-weight: 800;
-            font-size: clamp(1.8rem, 6vw, 2.5rem);
-            margin-top: 10px;
-            margin-bottom: 15px;
-            line-height: 1.2;
-            text-shadow: 0px 2px 4px rgba(0,0,0,0.2);
-        }}
+# ------------------------------------------------------------------
+# [수정 핵심] HTML 변수를 들여쓰기 없이 왼쪽 끝에 붙여서 정의
+# 코드가 조금 못생겨 보여도, 이렇게 해야 화면에 코드가 노출되지 않습니다.
+# ------------------------------------------------------------------
+header_html = f"""
+<style>
+    .stApp {{ background-color: {bg_color} !important; }}
+    .stMarkdown, p, h1, h2, h3, li, span {{ color: {text_color}; }}
+    header {{visibility: hidden;}}
+    
+    .custom-header {{
+        background-color: {header_bg};
+        padding: 2.5rem 1rem;
+        text-align: center;
+        margin-top: -60px;
+        margin-left: -5rem;
+        margin-right: -5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }}
+    .custom-header h1 {{
+        color: #FFFFFF !important;
+        font-family: sans-serif; font-weight: 800; font-size: 2.2rem;
+        margin-bottom: 15px; line-height: 1.2;
+    }}
+    .gold-text {{
+        color: #FFD700 !important; font-size: 1.2rem; font-weight: 800;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+    }}
+    .white-text {{
+        color: #FFFFFF !important; font-size: 1.0rem; font-weight: 400; opacity: 0.95;
+    }}
+    
+    div[data-testid="stFileUploader"] {{
+        border: 2px dashed {header_bg}; border-radius: 12px; padding: 20px;
+        background-color: {card_bg}; text-align: center;
+    }}
+    .result-box {{
+        background-color: {card_bg}; padding: 20px; border-radius: 12px;
+        border: 1px solid {border_color};
+    }}
+</style>
 
-        div[data-testid="stFileUploader"] {{
-            border: 2px dashed {header_bg};
-            border-radius: 12px;
-            padding: 20px;
-            background-color: {card_bg};
-            text-align: center;
-        }}
-        
-        .result-box {{
-            background-color: {card_bg};
-            padding: 20px;
-            border-radius: 12px;
-            border: 1px solid {border_color};
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }}
-        
-        .disclaimer {{
-            text-align: center;
-            font-size: 0.75rem;
-            color: {sub_text} !important;
-            margin-top: 30px;
-            margin-bottom: 50px;
-        }}
-    </style>
+<div class="custom-header">
+    <div style="font-size: 3rem; margin-bottom: 10px;">🦸‍♂️ ♡ 🦸‍♀️</div>
+    <h1>Super Parents<br>Heroes Without Borders</h1>
+    <p style="margin-bottom: 10px;">
+        <span class="gold-text">You remain your child's first and best teacher.</span>
+    </p>
+    <p>
+        <span class="white-text">Understand in your language, teach with confidence.<br>Let your wisdom cross the language barrier.</span>
+    </p>
+</div>
+"""
 
-    <div class="custom-header">
-        <div style="font-size: 3rem; margin-bottom: 0;">🦸‍♂️ ♡ 🦸‍♀️</div>
-        <h1>Super Parents<br>Heroes Without Borders</h1>
-        
-        <p style="color: #FFD700 !important; font-size: 1.25rem !important; font-weight: 800 !important; margin-bottom: 10px !important; text-shadow: 1px 1px 2px rgba(0,0,0,0.5) !important; opacity: 1 !important;">
-            You remain your child's first and best teacher.
-        </p>
+st.markdown(header_html, unsafe_allow_html=True)
 
-        <p style="color: #FFFFFF !important; font-size: 1.0rem !important; font-weight: 500 !important; line-height: 1.5 !important; margin-top: 0 !important; opacity: 0.95 !important;">
-            Understand in your language, teach with confidence.<br>
-            Let your wisdom cross the language barrier.
-        </p>
-    </div>
-""")
-
-st.markdown(html_design, unsafe_allow_html=True)
 
 # ==========================================
 # 3. 메인 화면
@@ -166,35 +143,23 @@ with st.container():
     
     col1, col2 = st.columns(2)
     with col1:
-        st.markdown(f"**🟣 Parent Language (Output)**")
+        st.markdown(f"**🟣 Parent Language**")
         parent_lang = st.selectbox(
             "Select Parent Language", 
             [
-                "English",
-                "Korean (한국어)", 
-                "Arabic (العربية)",
-                "Turkish (Türkçe)",
-                "Spanish (Español)",
-                "Portuguese (Português)",
-                "Dutch (Nederlands)",
-                "French (Français)",
-                "German (Deutsch)",
-                "Chinese (中文)",
-                "Japanese (日本語)",
-                "Polish (Polski)",
-                "Russian (Русский)",
-                "Thai (ภาษาไทย)", 
-                "Vietnamese (Tiếng Việt)"
+                "English", "Korean (한국어)", "Arabic (العربية)", "Turkish (Türkçe)",
+                "Spanish (Español)", "Portuguese (Português)", "Dutch (Nederlands)",
+                "French (Français)", "German (Deutsch)", "Chinese (中文)",
+                "Japanese (日本語)", "Polish (Polski)", "Russian (Русский)",
+                "Thai (ภาษาไทย)", "Vietnamese (Tiếng Việt)"
             ], 
-            index=0, 
             label_visibility="collapsed"
         )
     with col2:
-        st.markdown(f"**🟢 Homework Language (Input)**")
+        st.markdown(f"**🟢 Homework Language**")
         target_lang = st.selectbox(
             "Select Homework Language", 
             ["Dutch", "English", "German", "French", "Spanish", "Chinese", "Auto Detect"], 
-            index=0, 
             label_visibility="collapsed"
         )
 
@@ -230,13 +195,12 @@ with st.container():
                 status_text.error("❌ Error Occurred")
                 st.error(response_text)
             else:
-                status_text.success("✅ Ready to teach! (코칭 준비 완료!)")
+                status_text.success("✅ Ready to teach!")
                 st.markdown("### 🎉 Your Coaching Guide")
                 st.markdown(f'<div class="result-box">{response_text}</div>', unsafe_allow_html=True)
                 
                 st.markdown("""
-                    <div class="disclaimer">
+                    <div style="text-align: center; font-size: 0.75rem; color: #6B7280; margin-top: 30px; margin-bottom: 50px;">
                         ⚠️ <b>Disclaimer:</b> This tool supports parents but does not replace teachers.
-                        Results by AI may vary. Always verify with official school materials.
                     </div>
                 """, unsafe_allow_html=True)
