@@ -122,12 +122,12 @@ header_html = f"""
 
 <div class="custom-header">
     <div style="font-size: 3rem; margin-bottom: 10px;">🦸‍♂️ ♡ 🦸‍♀️</div>
-    <h1>Super Parents<br>Heros Across Languages</h1>
+    <h1>Super Parents<br>Heros Across<br> Languages</h1>
     <p style="margin-bottom: 10px;">
         <span class="gold-text">No barrier beats a parent’s love.</span>
     </p>
     <p>
-        <span class="white-text">Understand in your language, teach with confidence.<br>Children may speak differently, but they listen with their hearts.</span>
+        <span class="white-text">Understand in your language, teach with confidence.<br>Children may speak differently, <br>but they listen with their hearts.</span>
     </p>
 </div>
 """
