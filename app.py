@@ -22,13 +22,13 @@ genai.configure(api_key=API_KEY)
 MODEL_NAME = "gemini-2.5-flash" 
 
 st.set_page_config(
-    page_title="Super Parents: Heroes Without Borders", # 페이지 탭 이름도 변경
-    page_icon="🦸", # 아이콘 변경
+    page_title="Super Parents: Heroes Without Borders",
+    page_icon="🦸",
     layout="centered"
 )
 
 # ==========================================
-# [AI Function] 응답 생성 함수 (Global Setting)
+# [AI Function] 응답 생성 함수
 # ==========================================
 def get_gemini_response(image, parent_lang, homework_lang):
     """
@@ -36,7 +36,6 @@ def get_gemini_response(image, parent_lang, homework_lang):
     System instructions are in English for better global performance.
     """
     
-    # 프롬프트 지시문을 전면 영어로 변경 (모델 이해도 상승)
     prompt = f"""
     ### Role & Objective
     You are the **Lead AI Tutor** for the app "Super Parents".
@@ -72,9 +71,7 @@ def get_gemini_response(image, parent_lang, homework_lang):
     
     try:
         model = genai.GenerativeModel(MODEL_NAME)
-        # 이미지 리스트 처리 (혹시 모를 호환성 대비)
         content_input = [prompt, image[0]] if isinstance(image, list) else [prompt, image]
-        
         response = model.generate_content(content_input)
         return response.text
     except Exception as e:
@@ -82,7 +79,7 @@ def get_gemini_response(image, parent_lang, homework_lang):
 
 
 # ==========================================
-# 2. 테마 및 디자인 (CSS)
+# 2. 테마 및 디자인 (CSS & Header)
 # ==========================================
 
 with st.sidebar:
@@ -92,37 +89,31 @@ with st.sidebar:
     st.markdown("Developed with Google Gemini")
     st.caption("⚠️ AI can make mistakes. Please verify important information.")
 
+# 색상 설정
 if "Dark" in theme_mode:
     bg_color = "#0E1117"
     text_color = "#FAFAFA"
     card_bg = "#262730"
     border_color = "#374151"
-    header_bg = "#312E81" # 어두운 모드 헤더색 유지
+    header_bg = "#312E81" 
     sub_text = "#D1D5DB" 
 else:
     bg_color = "#F3F4F6"
     text_color = "#1F2937"
     card_bg = "#FFFFFF"
     border_color = "#E5E7EB"
-    header_bg = "#4F46E5" # 밝은 모드: 인디고 퍼플 계열 (슈퍼히어로 느낌)
+    header_bg = "#4F46E5" 
     sub_text = "#6B7280"
 
-
-# ==========================================
-# 수정된 디자인 및 헤더 코드
-# ==========================================
-st.markdown(f"""
+# [중요] HTML 들여쓰기를 완전히 제거하여 문자열 생성
+html_code = f"""
 <style>
-    /* 전체 앱 배경 및 폰트 설정 */
     .stApp {{ background-color: {bg_color} !important; }}
     .stMarkdown, .stMarkdown p, .stMarkdown h1, .stMarkdown h2, .stMarkdown h3, .stMarkdown li, .stMarkdown span {{ 
         color: {text_color} !important; 
     }}
-
-    /* 기본 헤더 숨김 */
     header {{visibility: hidden;}}
-
-    /* 커스텀 헤더 컨테이너 */
+    
     .custom-header {{
         background-color: {header_bg};
         padding: 2rem 1rem;
@@ -133,8 +124,7 @@ st.markdown(f"""
         margin-bottom: 2rem;
         box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }}
-
-    /* 헤더 타이틀 */
+    
     .custom-header h1 {{
         color: #FFFFFF !important;
         font-family: sans-serif;
@@ -146,7 +136,6 @@ st.markdown(f"""
         text-shadow: 0px 2px 4px rgba(0,0,0,0.2);
     }}
 
-    /* 파일 업로더 박스 디자인 */
     div[data-testid="stFileUploader"] {{
         border: 2px dashed {header_bg};
         border-radius: 12px;
@@ -154,8 +143,7 @@ st.markdown(f"""
         background-color: {card_bg};
         text-align: center;
     }}
-
-    /* 결과 박스 */
+    
     .result-box {{
         background-color: {card_bg};
         padding: 20px;
@@ -164,7 +152,6 @@ st.markdown(f"""
         box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }}
     
-    /* 면책 조항 */
     .disclaimer {{
         text-align: center;
         font-size: 0.75rem;
@@ -175,19 +162,19 @@ st.markdown(f"""
 </style>
 
 <div class="custom-header">
-    <div style="font-size: 3rem; margin-bottom: 0;">🦸‍♂️ ♡ 🦸‍♀️</div>
-    <h1>Super Parents<br>Heroes Without Borders</h1>
-    
-    <p style="color: #FFD700; font-size: 1.2rem; font-weight: 700; margin-bottom: 10px; text-shadow: 0px 1px 3px rgba(0,0,0,0.5);">
-        You remain your child's first and best teacher.
-    </p>
-
-    <p style="color: #FFFFFF; font-size: 1.0rem; font-weight: 400; line-height: 1.5; margin-top: 0; opacity: 0.95;">
-        Understand in your language, teach with confidence.<br>
-        Let your wisdom cross the language barrier.
-    </p>
+<div style="font-size: 3rem; margin-bottom: 0;">🦸‍♂️ ♡ 🦸‍♀️</div>
+<h1>Super Parents<br>Heroes Without Borders</h1>
+<p style="color: #FFD700; font-size: 1.2rem; font-weight: 700; margin-bottom: 10px; text-shadow: 0px 1px 3px rgba(0,0,0,0.5);">
+You remain your child's first and best teacher.
+</p>
+<p style="color: #FFFFFF; font-size: 1.0rem; font-weight: 400; line-height: 1.5; margin-top: 0; opacity: 0.95;">
+Understand in your language, teach with confidence.<br>
+Let your wisdom cross the language barrier.
+</p>
 </div>
-""", unsafe_allow_html=True)
+"""
+
+st.markdown(html_code, unsafe_allow_html=True)
 
 # ==========================================
 # 3. 메인 화면 (Main UI)
@@ -195,7 +182,6 @@ st.markdown(f"""
 
 with st.container():
     
-    # 언어 선택 영역
     col1, col2 = st.columns(2)
     with col1:
         st.markdown(f"**🟣 Parent Language (Output)**")
@@ -218,7 +204,7 @@ with st.container():
                 "Thai (ภาษาไทย)", 
                 "Vietnamese (Tiếng Việt)"
             ], 
-            index=0, # 기본값 English로 설정 (글로벌 타겟)
+            index=0, 
             label_visibility="collapsed"
         )
     with col2:
@@ -226,13 +212,12 @@ with st.container():
         target_lang = st.selectbox(
             "Select Homework Language", 
             ["Dutch", "English", "German", "French", "Spanish", "Chinese", "Auto Detect"], 
-            index=0, # 기본값 Dutch (현재 타겟)
+            index=0, 
             label_visibility="collapsed"
         )
 
     st.markdown("---")
     
-    # 단일 업로드 버튼
     st.markdown("### 📸 Upload Homework")
     st.caption("Tap 'Browse files' below to take a photo or choose from gallery.")
     
@@ -242,7 +227,6 @@ with st.container():
         label_visibility="collapsed"
     )
 
-    # 이미지 처리 로직
     if image_data is not None:
         image = Image.open(image_data)
         
@@ -251,20 +235,15 @@ with st.container():
         
         st.markdown("###") 
         
-        # 버튼 문구도 약간 더 힘있게 변경
         submit = st.button("🚀 Activate Super Parent Mode", type="primary", use_container_width=True)
 
         if submit:
             status_text = st.empty()
             status_text.info("🤖 AI is preparing your coaching guide...")
             
-            # 언어 텍스트 정리 (괄호 제거 등)
             p_lang_clean = parent_lang.split("(")[0].strip()
-            
-            # 함수 호출
             response_text = get_gemini_response(image, p_lang_clean, target_lang)
             
-            # 결과 출력
             if "Error:" in response_text:
                 status_text.error("❌ Error Occurred")
                 st.error(response_text)
@@ -273,7 +252,6 @@ with st.container():
                 st.markdown("### 🎉 Your Coaching Guide")
                 st.markdown(f'<div class="result-box">{response_text}</div>', unsafe_allow_html=True)
                 
-                # 면책 조항
                 st.markdown("""
                     <div class="disclaimer">
                         ⚠️ <b>Disclaimer:</b> This tool supports parents but does not replace teachers.
