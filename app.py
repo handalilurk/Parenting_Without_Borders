@@ -6,16 +6,24 @@ from PIL import Image
 # 1. 기본 설정
 # ==========================================
 
-# [중요] API 키 가져오기
+# [중요] API 키 설정
 if "GOOGLE_API_KEY" in st.secrets:
     API_KEY = st.secrets["GOOGLE_API_KEY"]
 else:
-    st.error("API 키가 설정되지 않았습니다. Streamlit Secrets를 확인하세요.")
-    st.stop()
+    # 로컬 테스트 시 에러 방지를 위해 임시 처리 (배포 시엔 Secrets 사용 필수)
+    # st.secrets가 없을 경우를 대비해 직접 입력하거나 에러 처리
+    try:
+        API_KEY = st.secrets["GOOGLE_API_KEY"]
+    except:
+        # 배포 전 로컬 테스트를 위해 임시 키를 넣을 수 있는 곳
+        # API_KEY = "여기에_API_키를_넣으세요" 
+        st.error("API 키를 찾을 수 없습니다. Streamlit Cloud의 Secrets 설정을 확인해주세요.")
+        st.stop()
 
 genai.configure(api_key=API_KEY)
 
-# [사용자 요청] 모델 버전 변경 (2.5가 아직 출시 전이라면 에러가 날 수 있으니 확인 필요)
+# 모델 설정 (2.5 버전이 아직 API에 없을 경우 1.5로 자동 대체하는 로직은 복잡하므로, 우선 1.5 Flash 권장)
+# 만약 2.5가 안 되면 "gemini-1.5-flash"로 변경해주세요.
 MODEL_NAME = "gemini-2.5-flash" 
 
 st.set_page_config(
@@ -33,7 +41,6 @@ with st.sidebar:
     theme_mode = st.selectbox("Theme Mode", ["Light Mode (Default)", "Dark Mode"])
     st.divider()
     st.markdown("Developed with Google Gemini")
-    # [추가 1] 사이드바 하단에도 짧은 경고 문구 추가
     st.caption("⚠️ AI can make mistakes. Please verify important information.")
 
 if "Dark" in theme_mode:
@@ -42,14 +49,14 @@ if "Dark" in theme_mode:
     card_bg = "#262730"
     border_color = "#374151"
     header_bg = "#312E81"
-    sub_text = "#9CA3AF" # 면책 조항용 회색 텍스트 색상
+    sub_text = "#9CA3AF"
 else:
     bg_color = "#F3F4F6"
     text_color = "#1F2937"
     card_bg = "#FFFFFF"
     border_color = "#E5E7EB"
     header_bg = "#4F46E5"
-    sub_text = "#6B7280" # 면책 조항용 회색 텍스트 색상
+    sub_text = "#6B7280"
 
 st.markdown(f"""
     <style>
@@ -85,7 +92,20 @@ st.markdown(f"""
         padding: 0 10px;
     }}
 
-    div[data-testid="stFileUploader"] {{
+    /* 탭 스타일링 */
+    .stTabs [data-baseweb="tab-list"] {{
+        gap: 10px;
+    }}
+    .stTabs [data-baseweb="tab"] {{
+        height: 50px;
+        background-color: {card_bg};
+        border-radius: 5px;
+        padding: 0 20px; 
+        border: 1px solid {border_color};
+    }}
+    
+    /* 파일 업로더 및 카메라 인풋 스타일 */
+    div[data-testid="stFileUploader"], div[data-testid="stCameraInput"] {{
         border: 2px dashed {header_bg};
         border-radius: 10px;
         padding: 20px;
@@ -99,8 +119,7 @@ st.markdown(f"""
         border: 1px solid {border_color};
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }}
-
-    /* [추가 2] 면책 조항 스타일 (작고 흐린 글씨) */
+    
     .disclaimer {{
         text-align: center;
         font-size: 0.8rem;
@@ -157,11 +176,28 @@ with st.container():
 
     st.markdown("---")
     
-    uploaded_file = st.file_uploader("Take a photo or upload", type=["jpg", "png", "jpeg"])
+    # [수정됨] 탭을 사용하여 파일 업로드와 카메라 기능을 분리
+    tab1, tab2 = st.tabs(["📁 Upload Image", "📸 Take Photo"])
+    
+    image_data = None # 최종적으로 분석할 이미지를 담을 변수
 
-    if uploaded_file is not None:
-        image = Image.open(uploaded_file)
-        st.image(image, caption="Uploaded Image", use_column_width=True)
+    with tab1:
+        uploaded_file = st.file_uploader("Choose an image from gallery", type=["jpg", "png", "jpeg"])
+        if uploaded_file is not None:
+            image_data = uploaded_file
+
+    with tab2:
+        camera_file = st.camera_input("Take a picture directly")
+        if camera_file is not None:
+            image_data = camera_file
+
+    # 이미지가 (파일이든 카메라든) 들어왔을 때 실행
+    if image_data is not None:
+        image = Image.open(image_data)
+        
+        # 탭 안에 이미지가 중복으로 보이지 않게 결과창 위에만 미리보기 표시
+        st.markdown("### Preview")
+        st.image(image, caption="Homework Image", use_column_width=True)
         
         st.markdown("###") 
         
@@ -196,7 +232,7 @@ with st.container():
                 st.markdown("### 🎉 Analysis Result")
                 st.markdown(f'<div class="result-box">{response.text}</div>', unsafe_allow_html=True)
                 
-                # [추가 3] 분석 결과 아래에 면책 조항 표시
+                # 면책 조항
                 st.markdown("""
                     <div class="disclaimer">
                         ⚠️ <b>Disclaimer:</b> This service uses Artificial Intelligence. 
