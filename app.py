@@ -3,22 +3,18 @@ import google.generativeai as genai
 from PIL import Image
 
 # ==========================================
-# 1. 기본 설정 (Configuration)
+# 1. 기본 설정
 # ==========================================
-
-# [중요] API 키 설정
 if "GOOGLE_API_KEY" in st.secrets:
     API_KEY = st.secrets["GOOGLE_API_KEY"]
 else:
     try:
         API_KEY = st.secrets["GOOGLE_API_KEY"]
     except:
-        st.error("API 키를 찾을 수 없습니다. Streamlit Cloud의 Secrets 설정을 확인해주세요.")
+        st.error("API 키를 찾을 수 없습니다.")
         st.stop()
 
 genai.configure(api_key=API_KEY)
-
-# 모델 설정
 MODEL_NAME = "gemini-2.5-flash" 
 
 st.set_page_config(
@@ -61,7 +57,6 @@ def get_gemini_response(image, parent_lang, homework_lang):
     except Exception as e:
         return f"Error occurred during analysis: {e}"
 
-
 # ==========================================
 # 2. 테마 및 디자인 (CSS & Header)
 # ==========================================
@@ -73,7 +68,6 @@ with st.sidebar:
     st.markdown("Developed with Google Gemini")
     st.caption("⚠️ AI can make mistakes. Please verify important information.")
 
-# 색상 변수 설정
 if "Dark" in theme_mode:
     bg_color = "#0E1117"
     text_color = "#FAFAFA"
@@ -89,11 +83,8 @@ else:
     header_bg = "#4F46E5" 
     sub_text = "#6B7280"
 
-# ---------------------------------------------------------
-# [수정 핵심] HTML 문자열 생성
-# 색상을 !important로 강제하여 Streamlit 기본 테마를 덮어씁니다.
-# ---------------------------------------------------------
-html_code = f"""
+# [핵심 수정] HTML 코드를 왼쪽 끝으로 바짝 당겼습니다. (들여쓰기 없음)
+st.markdown(f"""
 <style>
     .stApp {{ background-color: {bg_color} !important; }}
     .stMarkdown, .stMarkdown p, .stMarkdown h1, .stMarkdown h2, .stMarkdown h3, .stMarkdown li, .stMarkdown span {{ 
@@ -101,7 +92,6 @@ html_code = f"""
     }}
     header {{visibility: hidden;}}
     
-    /* 헤더 박스 스타일 */
     .custom-header {{
         background-color: {header_bg};
         padding: 2rem 1rem;
@@ -113,9 +103,8 @@ html_code = f"""
         box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }}
     
-    /* 타이틀 스타일 */
     .custom-header h1 {{
-        color: #FFFFFF !important; /* 흰색 강제 */
+        color: #FFFFFF !important;
         font-family: sans-serif;
         font-weight: 800;
         font-size: clamp(1.8rem, 6vw, 2.5rem);
@@ -151,39 +140,20 @@ html_code = f"""
 </style>
 
 <div class="custom-header">
-    <div style="font-size: 3rem; margin-bottom: 0;">🦸‍♂️ ♡ 🦸‍♀️</div>
-    
-    <h1>Super Parents<br>Heroes Without Borders</h1>
-    
-    <p style="
-        color: #FFD700 !important; 
-        font-size: 1.25rem !important; 
-        font-weight: 800 !important; 
-        margin-bottom: 10px !important; 
-        text-shadow: 1px 1px 2px rgba(0,0,0,0.5) !important;
-        opacity: 1 !important;
-    ">
-        You remain your child's first and best teacher.
-    </p>
-
-    <p style="
-        color: #FFFFFF !important; 
-        font-size: 1.0rem !important; 
-        font-weight: 500 !important; 
-        line-height: 1.5 !important; 
-        margin-top: 0 !important; 
-        opacity: 0.95 !important;
-    ">
-        Understand in your language, teach with confidence.<br>
-        Let your wisdom cross the language barrier.
-    </p>
+<div style="font-size: 3rem; margin-bottom: 0;">🦸‍♂️ ♡ 🦸‍♀️</div>
+<h1>Super Parents<br>Heroes Without Borders</h1>
+<p style="color: #FFD700 !important; font-size: 1.25rem !important; font-weight: 800 !important; margin-bottom: 10px !important; text-shadow: 1px 1px 2px rgba(0,0,0,0.5) !important; opacity: 1 !important;">
+You remain your child's first and best teacher.
+</p>
+<p style="color: #FFFFFF !important; font-size: 1.0rem !important; font-weight: 500 !important; line-height: 1.5 !important; margin-top: 0 !important; opacity: 0.95 !important;">
+Understand in your language, teach with confidence.<br>
+Let your wisdom cross the language barrier.
+</p>
 </div>
-"""
-
-st.markdown(html_code, unsafe_allow_html=True)
+""", unsafe_allow_html=True)
 
 # ==========================================
-# 3. 메인 화면 (Main UI)
+# 3. 메인 화면
 # ==========================================
 
 with st.container():
