@@ -107,89 +107,102 @@ else:
     header_bg = "#4F46E5" # 밝은 모드: 인디고 퍼플 계열 (슈퍼히어로 느낌)
     sub_text = "#6B7280"
 
+
+# ==========================================
+# 수정된 디자인 및 헤더 코드
+# ==========================================
 st.markdown(f"""
-    <style>
+<style>
+    /* 전체 앱 배경 및 폰트 설정 */
     .stApp {{ background-color: {bg_color} !important; }}
-    .stMarkdown, .stMarkdown p, .stMarkdown h1, .stMarkdown h2, .stMarkdown h3, .stMarkdown li, .stMarkdown span {{ color: {text_color} !important; }}
-    
+    .stMarkdown, .stMarkdown p, .stMarkdown h1, .stMarkdown h2, .stMarkdown h3, .stMarkdown li, .stMarkdown span {{ 
+        color: {text_color} !important; 
+    }}
+
+    /* 헤더 숨김 */
     header {{visibility: hidden;}}
-    
+
+    /* 커스텀 헤더 컨테이너 */
     .custom-header {{
         background-color: {header_bg};
-        padding: 2.5rem 1rem; /* 상하 패딩 약간 증가 */
+        padding: 2rem 1rem; /* 모바일 여백 최적화 */
         text-align: center;
-        margin-top: -50px;
+        margin-top: -60px; /* 상단 빈 공간 제거 */
         margin-left: -5rem;
         margin-right: -5rem;
         margin-bottom: 2rem;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    }}
-    
-    .custom-header h1 {{
-        color: white !important;
-        font-weight: 800; /* 폰트 더 두껍게 */
-        font-size: clamp(2.0rem, 5vw, 2.8rem); /* 타이틀 크기 증가 */
-        margin-bottom: 0.5rem;
-        white-space: normal;
-        word-wrap: break-word;
-        line-height: 1.2;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.3); /* 슈퍼히어로 느낌의 그림자 추가 */
-    }}
-    
-    /* 서브타이틀 스타일 강화 */
-    .header-main-sub {{
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: #FFFFFF !important;
-        margin-bottom: 0.8rem;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }}
 
-    .header-sub {{
-        color: #E0E7FF !important;
-        font-size: 1.05rem;
-        line-height: 1.5;
+    /* 헤더 타이틀 (Super Parents...) */
+    .custom-header h1 {{
+        color: #FFFFFF !important;
+        font-family: sans-serif;
+        font-weight: 800;
+        font-size: clamp(1.5rem, 6vw, 2.5rem); /* 모바일에서 글자 크기 자동 조절 */
+        margin-top: 10px;
+        margin-bottom: 15px;
+        line-height: 1.2;
+        text-shadow: 0px 2px 4px rgba(0,0,0,0.2);
+    }}
+
+    /* 서브타이틀 1 (You remain...) */
+    .header-main-sub {{
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #FFFFFF !important; /* 강제 흰색 */
+        margin-bottom: 5px;
+        opacity: 0.95;
         padding: 0 10px;
     }}
 
-    /* 파일 업로더 디자인 커스텀 */
+    /* 서브타이틀 2 (Understand in your language...) */
+    .header-sub {{
+        font-size: 0.9rem;
+        color: #E0E7FF !important; /* 연한 보라/흰색 */
+        font-weight: 400;
+        line-height: 1.4;
+        padding: 0 15px;
+        opacity: 0.9;
+    }}
+
+    /* 파일 업로더 박스 디자인 */
     div[data-testid="stFileUploader"] {{
         border: 2px dashed {header_bg};
-        border-radius: 10px;
-        padding: 30px;
+        border-radius: 12px;
+        padding: 20px;
         background-color: {card_bg};
         text-align: center;
     }}
-    
-    /* 결과 박스 디자인 */
+
+    /* 결과 박스 */
     .result-box {{
         background-color: {card_bg};
-        padding: 25px;
-        border-radius: 10px;
+        padding: 20px;
+        border-radius: 12px;
         border: 1px solid {border_color};
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }}
     
+    /* 면책 조항 */
     .disclaimer {{
         text-align: center;
-        font-size: 0.8rem;
+        font-size: 0.75rem;
         color: {sub_text} !important;
-        margin-top: 20px;
+        margin-top: 30px;
         margin-bottom: 50px;
     }}
-    </style>
-    
-    <div class="custom-header">
-        <div style="font-size: 3rem; margin-bottom: 10px;">🦸‍♂️ ♡ 🦸‍♀️</div>
-        <h1>Super Parents: Heroes Without Borders</h1>
-        
-        <p class="header-main-sub">
-            You remain your child's first and best teacher.
-        </p>
-        <p class="header-sub">
-            Understand in your language, teach with confidence.<br>
-            Let your wisdom cross the language barrier and reach your child.
-        </p>
-    </div>
+</style>
+
+<div class="custom-header">
+<div style="font-size: 3rem; margin-bottom: 0;">🦸‍♂️ ♡ 🦸‍♀️</div>
+<h1>Super Parents<br>Heroes Without Borders</h1>
+<p class="header-main-sub">You remain your child's first and best teacher.</p>
+<p class="header-sub">
+Understand in your language, teach with confidence.<br>
+Let your wisdom cross the language barrier.
+</p>
+</div>
 """, unsafe_allow_html=True)
 
 # ==========================================
