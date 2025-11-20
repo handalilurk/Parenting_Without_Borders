@@ -3,7 +3,7 @@ import google.generativeai as genai
 from PIL import Image
 
 # ==========================================
-# 1. 기본 설정
+# 1. 기본 설정 (Configuration)
 # ==========================================
 
 # [중요] API 키 설정
@@ -13,14 +13,12 @@ else:
     try:
         API_KEY = st.secrets["GOOGLE_API_KEY"]
     except:
-        # 로컬 테스트용
-        # API_KEY = "여기에_API_키를_넣으세요" 
         st.error("API 키를 찾을 수 없습니다. Streamlit Cloud의 Secrets 설정을 확인해주세요.")
         st.stop()
 
 genai.configure(api_key=API_KEY)
 
-# [변경] 모델 설정: Gemini 2.5 Flash 적용
+# 모델 설정: Gemini 2.5 Flash 적용
 MODEL_NAME = "gemini-2.5-flash" 
 
 st.set_page_config(
@@ -29,9 +27,8 @@ st.set_page_config(
     layout="centered"
 )
 
-
 # ==========================================
-# [NEW] AI Response Function (Global Setting)
+# [AI Function] 응답 생성 함수 (Global Setting)
 # ==========================================
 def get_gemini_response(image, parent_lang, homework_lang):
     """
@@ -84,9 +81,8 @@ def get_gemini_response(image, parent_lang, homework_lang):
         return f"Error occurred during analysis: {e}"
 
 
-
 # ==========================================
-# 2. 테마 설정 및 CSS (기존 디자인 유지)
+# 2. 테마 및 디자인 (CSS)
 # ==========================================
 
 with st.sidebar:
@@ -145,40 +141,16 @@ st.markdown(f"""
         padding: 0 10px;
     }}
 
-    /* 탭 스타일링 */
-    .stTabs [data-baseweb="tab-list"] {{
-        gap: 8px;
-        background-color: transparent;
-        padding-bottom: 10px;
-    }}
-
-    .stTabs [data-baseweb="tab"] {{
-        height: 50px;
-        width: 100%; 
-        background-color: {card_bg};
-        border: 1px solid {border_color};
-        border-radius: 8px;
-        color: {text_color};
-        font-weight: 400;
-        flex-grow: 1; 
-        justify-content: center; 
-    }}
-    
-    .stTabs [aria-selected="true"] {{
-        background-color: {header_bg} !important; 
-        color: white !important; 
-        border: none !important;
-        font-weight: 700 !important;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
-    }}
-
-    div[data-testid="stFileUploader"], div[data-testid="stCameraInput"] {{
+    /* 파일 업로더 디자인 커스텀 */
+    div[data-testid="stFileUploader"] {{
         border: 2px dashed {header_bg};
         border-radius: 10px;
-        padding: 20px;
+        padding: 30px;
         background-color: {card_bg};
+        text-align: center;
     }}
     
+    /* 결과 박스 디자인 */
     .result-box {{
         background-color: {card_bg};
         padding: 25px;
@@ -199,16 +171,17 @@ st.markdown(f"""
     <div class="custom-header">
         <div style="font-size: 3rem; margin-bottom: 10px;">📖 ♡ 文</div>
         <h1>Parenting Without Borders</h1>
-        <p>Upload a photo of your child's homework.<br>We'll translate and help you guide them.</p>
+        <p>Global Parenting Support<br>Translate & Guide Homework in Your Language</p>
     </div>
 """, unsafe_allow_html=True)
 
 # ==========================================
-# 3. 메인 화면
+# 3. 메인 화면 (Main UI)
 # ==========================================
 
 with st.container():
     
+    # 언어 선택 영역
     col1, col2 = st.columns(2)
     with col1:
         st.markdown(f"**🟣 Parent Language (Output)**")
@@ -243,29 +216,23 @@ with st.container():
 
     st.markdown("---")
     
-    # 탭 생성
-    tab1, tab2 = st.tabs(["📁 Upload Image", "📸 Take Photo"])
+    # [변경] 탭 제거 -> 단일 업로드 버튼으로 통합
+    # 모바일에서는 이 버튼 하나로 '사진 찍기'와 '앨범 선택'이 모두 가능합니다.
+    st.markdown("### 📸 Upload Homework")
+    st.caption("Tap 'Browse files' below to take a photo or choose from gallery.")
     
-    image_data = None
-
-    with tab1:
-        st.caption("Choose an image from your gallery") 
-        uploaded_file = st.file_uploader("Upload Image", type=["jpg", "png", "jpeg"], label_visibility="collapsed")
-        if uploaded_file is not None:
-            image_data = uploaded_file
-
-    with tab2:
-        st.caption("Take a picture of the homework directly") 
-        camera_file = st.camera_input("Take Photo", label_visibility="collapsed")
-        if camera_file is not None:
-            image_data = camera_file
+    image_data = st.file_uploader(
+        "Upload Image or Take Photo", 
+        type=["jpg", "png", "jpeg"], 
+        label_visibility="collapsed"
+    )
 
     # 이미지 처리 로직
     if image_data is not None:
         image = Image.open(image_data)
         
         st.markdown("### Preview")
-        st.image(image, caption="Homework Image", use_column_width=True)
+        st.image(image, caption="Uploaded Homework", use_column_width=True)
         
         st.markdown("###") 
         
@@ -278,7 +245,7 @@ with st.container():
             # 언어 텍스트 정리 (괄호 제거 등)
             p_lang_clean = parent_lang.split("(")[0].strip()
             
-            # [변경] 새로 만든 함수 호출
+            # 함수 호출
             response_text = get_gemini_response(image, p_lang_clean, target_lang)
             
             # 결과 출력
