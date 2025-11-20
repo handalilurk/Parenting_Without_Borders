@@ -1,6 +1,7 @@
 import streamlit as st
 import google.generativeai as genai
 from PIL import Image
+import textwrap # [핵심] 들여쓰기 문제를 해결하는 라이브러리
 
 # ==========================================
 # 1. 기본 설정
@@ -27,9 +28,6 @@ st.set_page_config(
 # [AI Function] 응답 생성 함수
 # ==========================================
 def get_gemini_response(image, parent_lang, homework_lang):
-    """
-    Generates a coaching guide using Gemini 2.5 Flash.
-    """
     prompt = f"""
     ### Role & Objective
     You are the **Lead AI Tutor** for the app "Super Parents".
@@ -66,8 +64,9 @@ with st.sidebar:
     theme_mode = st.selectbox("Theme Mode", ["Light Mode (Default)", "Dark Mode"])
     st.divider()
     st.markdown("Developed with Google Gemini")
-    st.caption("⚠️ AI can make mistakes. Please verify important information.")
+    st.caption("⚠️ AI can make mistakes. Please verify.")
 
+# 색상 변수 설정
 if "Dark" in theme_mode:
     bg_color = "#0E1117"
     text_color = "#FAFAFA"
@@ -83,74 +82,81 @@ else:
     header_bg = "#4F46E5" 
     sub_text = "#6B7280"
 
-# [핵심 수정] HTML 코드를 왼쪽 끝으로 바짝 당겼습니다. (들여쓰기 없음)
-st.markdown(f"""
-<style>
-    .stApp {{ background-color: {bg_color} !important; }}
-    .stMarkdown, .stMarkdown p, .stMarkdown h1, .stMarkdown h2, .stMarkdown h3, .stMarkdown li, .stMarkdown span {{ 
-        color: {text_color} !important; 
-    }}
-    header {{visibility: hidden;}}
-    
-    .custom-header {{
-        background-color: {header_bg};
-        padding: 2rem 1rem;
-        text-align: center;
-        margin-top: -60px;
-        margin-left: -5rem;
-        margin-right: -5rem;
-        margin-bottom: 2rem;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }}
-    
-    .custom-header h1 {{
-        color: #FFFFFF !important;
-        font-family: sans-serif;
-        font-weight: 800;
-        font-size: clamp(1.8rem, 6vw, 2.5rem);
-        margin-top: 10px;
-        margin-bottom: 15px;
-        line-height: 1.2;
-        text-shadow: 0px 2px 4px rgba(0,0,0,0.2);
-    }}
+# ---------------------------------------------------------
+# [문제 해결] textwrap.dedent를 사용하여 
+# 파이썬 들여쓰기를 무시하고 HTML을 렌더링합니다.
+# ---------------------------------------------------------
+html_design = textwrap.dedent(f"""
+    <style>
+        .stApp {{ background-color: {bg_color} !important; }}
+        .stMarkdown, .stMarkdown p, .stMarkdown h1, .stMarkdown h2, .stMarkdown h3, .stMarkdown li, .stMarkdown span {{ 
+            color: {text_color} !important; 
+        }}
+        header {{visibility: hidden;}}
+        
+        .custom-header {{
+            background-color: {header_bg};
+            padding: 2rem 1rem;
+            text-align: center;
+            margin-top: -60px;
+            margin-left: -5rem;
+            margin-right: -5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }}
+        
+        .custom-header h1 {{
+            color: #FFFFFF !important;
+            font-family: sans-serif;
+            font-weight: 800;
+            font-size: clamp(1.8rem, 6vw, 2.5rem);
+            margin-top: 10px;
+            margin-bottom: 15px;
+            line-height: 1.2;
+            text-shadow: 0px 2px 4px rgba(0,0,0,0.2);
+        }}
 
-    div[data-testid="stFileUploader"] {{
-        border: 2px dashed {header_bg};
-        border-radius: 12px;
-        padding: 20px;
-        background-color: {card_bg};
-        text-align: center;
-    }}
-    
-    .result-box {{
-        background-color: {card_bg};
-        padding: 20px;
-        border-radius: 12px;
-        border: 1px solid {border_color};
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }}
-    
-    .disclaimer {{
-        text-align: center;
-        font-size: 0.75rem;
-        color: {sub_text} !important;
-        margin-top: 30px;
-        margin-bottom: 50px;
-    }}
-</style>
+        div[data-testid="stFileUploader"] {{
+            border: 2px dashed {header_bg};
+            border-radius: 12px;
+            padding: 20px;
+            background-color: {card_bg};
+            text-align: center;
+        }}
+        
+        .result-box {{
+            background-color: {card_bg};
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid {border_color};
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }}
+        
+        .disclaimer {{
+            text-align: center;
+            font-size: 0.75rem;
+            color: {sub_text} !important;
+            margin-top: 30px;
+            margin-bottom: 50px;
+        }}
+    </style>
 
-<div class="custom-header">
-<div style="font-size: 3rem; margin-bottom: 0;">🦸‍♂️ ♡ 🦸‍♀️</div>
-<h1>Super Parents<br>Heroes Without Borders</h1>
-<p style="color: #FFD700 !important; font-size: 1.25rem !important; font-weight: 800 !important; margin-bottom: 10px !important; text-shadow: 1px 1px 2px rgba(0,0,0,0.5) !important; opacity: 1 !important;">
-You remain your child's first and best teacher.
-</p>
-<p style="color: #FFFFFF !important; font-size: 1.0rem !important; font-weight: 500 !important; line-height: 1.5 !important; margin-top: 0 !important; opacity: 0.95 !important;">
-Understand in your language, teach with confidence.<br>
-Let your wisdom cross the language barrier.
-</p>
-</div>
-""", unsafe_allow_html=True)
+    <div class="custom-header">
+        <div style="font-size: 3rem; margin-bottom: 0;">🦸‍♂️ ♡ 🦸‍♀️</div>
+        <h1>Super Parents<br>Heroes Without Borders</h1>
+        
+        <p style="color: #FFD700 !important; font-size: 1.25rem !important; font-weight: 800 !important; margin-bottom: 10px !important; text-shadow: 1px 1px 2px rgba(0,0,0,0.5) !important; opacity: 1 !important;">
+            You remain your child's first and best teacher.
+        </p>
+
+        <p style="color: #FFFFFF !important; font-size: 1.0rem !important; font-weight: 500 !important; line-height: 1.5 !important; margin-top: 0 !important; opacity: 0.95 !important;">
+            Understand in your language, teach with confidence.<br>
+            Let your wisdom cross the language barrier.
+        </p>
+    </div>
+""")
+
+st.markdown(html_design, unsafe_allow_html=True)
 
 # ==========================================
 # 3. 메인 화면
