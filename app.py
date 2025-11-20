@@ -20,7 +20,7 @@ else:
 
 genai.configure(api_key=API_KEY)
 
-# 모델 설정
+# [변경] 모델 설정: Gemini 2.5 Flash 적용
 MODEL_NAME = "gemini-2.5-flash" 
 
 st.set_page_config(
@@ -29,8 +29,64 @@ st.set_page_config(
     layout="centered"
 )
 
+
 # ==========================================
-# 2. 테마 설정 및 CSS
+# [NEW] AI Response Function (Global Setting)
+# ==========================================
+def get_gemini_response(image, parent_lang, homework_lang):
+    """
+    Generates a coaching guide using Gemini 2.5 Flash.
+    System instructions are in English for better global performance.
+    """
+    
+    # 프롬프트 지시문을 전면 영어로 변경 (모델 이해도 상승)
+    prompt = f"""
+    ### Role & Objective
+    You are the **Lead AI Tutor** for the app "Parenting Without Borders".
+    Your goal is to empower a parent who speaks **[ {parent_lang} ]** to perfectly understand and guide their child's homework (originally in **[ {homework_lang} ]**).
+
+    ### Instructions
+    Analyze the provided homework image and generate a structured guide.
+    **The final output must be written entirely in {parent_lang}.**
+
+    ### Output Format (Please follow this structure)
+    
+    1. **🎯 Homework Overview (1-Sentence Summary)**
+       - Briefly explain the core learning objective of this assignment to the parent.
+    
+    2. **🗣️ Coaching Guide (Conversational Scripts)**
+       - Provide specific dialogue/scripts the parent can say to the child.
+       - Do NOT just give the answers. Instead, provide **guiding questions** to stimulate the child's thinking.
+       - (e.g., "Ask your child: 'What do you think happens if we add these two numbers?'")
+
+    3. **📝 Essential Vocabulary (Table Format)**
+       - Select 3-5 key terms from the homework image.
+       - Columns: [Original Word] | [Pronunciation (written in {parent_lang})] | [Meaning in {parent_lang}]
+
+    4. **💡 Teacher's Pro Tip**
+       - Explain the underlying concept, formula, or cultural context simply.
+       - Mention common mistakes or traps students often fall into.
+
+    ### Tone & Style
+    - Professional, supportive, and encouraging (like a kind teacher).
+    - Use clear **Markdown** (Bold, Tables, Lists) for readability.
+    - **CRITICAL:** Regardless of the input language, your entire response must be in **{parent_lang}**.
+    """
+    
+    try:
+        model = genai.GenerativeModel(MODEL_NAME)
+        # 이미지 리스트 처리 (혹시 모를 호환성 대비)
+        content_input = [prompt, image[0]] if isinstance(image, list) else [prompt, image]
+        
+        response = model.generate_content(content_input)
+        return response.text
+    except Exception as e:
+        return f"Error occurred during analysis: {e}"
+
+
+
+# ==========================================
+# 2. 테마 설정 및 CSS (기존 디자인 유지)
 # ==========================================
 
 with st.sidebar:
@@ -46,7 +102,6 @@ if "Dark" in theme_mode:
     card_bg = "#262730"
     border_color = "#374151"
     header_bg = "#312E81"
-    # [수정 1] 다크모드 면책조항 글씨를 더 밝은 회색으로 변경 (가독성 확보)
     sub_text = "#D1D5DB" 
 else:
     bg_color = "#F3F4F6"
@@ -90,35 +145,31 @@ st.markdown(f"""
         padding: 0 10px;
     }}
 
-    /* [수정 2] 모바일 친화적 탭 스타일링 (Segmented Control) */
-    
-    /* 탭 컨테이너: 간격 없애기 */
+    /* 탭 스타일링 */
     .stTabs [data-baseweb="tab-list"] {{
         gap: 8px;
         background-color: transparent;
         padding-bottom: 10px;
     }}
 
-    /* 기본 탭 (선택 안 된 상태): 흐리게 표시 */
     .stTabs [data-baseweb="tab"] {{
         height: 50px;
-        width: 100%; /* 모바일에서 꽉 차게 */
+        width: 100%; 
         background-color: {card_bg};
         border: 1px solid {border_color};
         border-radius: 8px;
         color: {text_color};
         font-weight: 400;
-        flex-grow: 1; /* 화면 너비에 맞춰 늘어남 */
-        justify-content: center; /* 텍스트 가운데 정렬 */
+        flex-grow: 1; 
+        justify-content: center; 
     }}
     
-    /* 선택된 탭 (Active): 진한 색으로 꽉 채워서 확실하게 표시 */
     .stTabs [aria-selected="true"] {{
-        background-color: {header_bg} !important; /* 브랜드 컬러 배경 */
-        color: white !important; /* 흰색 글씨 */
+        background-color: {header_bg} !important; 
+        color: white !important; 
         border: none !important;
         font-weight: 700 !important;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* 살짝 떠 있는 느낌 */
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
     }}
 
     div[data-testid="stFileUploader"], div[data-testid="stCameraInput"] {{
@@ -198,13 +249,13 @@ with st.container():
     image_data = None
 
     with tab1:
-        st.caption("Choose an image from your gallery") # 안내 문구 추가
+        st.caption("Choose an image from your gallery") 
         uploaded_file = st.file_uploader("Upload Image", type=["jpg", "png", "jpeg"], label_visibility="collapsed")
         if uploaded_file is not None:
             image_data = uploaded_file
 
     with tab2:
-        st.caption("Take a picture of the homework directly") # 안내 문구 추가
+        st.caption("Take a picture of the homework directly") 
         camera_file = st.camera_input("Take Photo", label_visibility="collapsed")
         if camera_file is not None:
             image_data = camera_file
@@ -224,30 +275,20 @@ with st.container():
             status_text = st.empty()
             status_text.info("🤖 AI Tutor is analyzing... Please wait.")
             
-            try:
-                p_lang = parent_lang.split("(")[0].strip()
-                t_lang = target_lang
-                
-                real_prompt = f"""
-                **Role:** You are a helpful AI tutor for parents.
-                **Goal:** Analyze the homework image (Language: {t_lang}) and explain it in **{p_lang}**.
-                
-                **Output Format:**
-                1. **Overview**: What is this homework about? (Subject, Topic)
-                2. **Detailed Explanation**: Translate and explain the questions step-by-step in {p_lang}.
-                3. **Vocabulary**: Key words table ({t_lang} -> {p_lang}).
-                4. **Coaching Tip**: How should the parent ask the child? (Provide sentences in {t_lang} and {p_lang}).
-                
-                **Constraint:** The final explanation must be in **{p_lang}**.
-                """
-                
-                model = genai.GenerativeModel(MODEL_NAME)
-                response = model.generate_content([real_prompt, image])
-                
+            # 언어 텍스트 정리 (괄호 제거 등)
+            p_lang_clean = parent_lang.split("(")[0].strip()
+            
+            # [변경] 새로 만든 함수 호출
+            response_text = get_gemini_response(image, p_lang_clean, target_lang)
+            
+            # 결과 출력
+            if "Error:" in response_text:
+                status_text.error("❌ Error Occurred")
+                st.error(response_text)
+            else:
                 status_text.success("✅ Analysis Complete!")
-                
                 st.markdown("### 🎉 Analysis Result")
-                st.markdown(f'<div class="result-box">{response.text}</div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="result-box">{response_text}</div>', unsafe_allow_html=True)
                 
                 # 면책 조항
                 st.markdown("""
@@ -257,7 +298,3 @@ with st.container():
                         and verify important information with school materials.
                     </div>
                 """, unsafe_allow_html=True)
-                
-            except Exception as e:
-                status_text.error("❌ Error Occurred")
-                st.error(f"Details: {e}")
