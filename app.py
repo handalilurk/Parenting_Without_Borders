@@ -51,7 +51,7 @@ def get_gemini_response(image, parent_lang, homework_lang):
        - Now that the parent knows the answer, tell them *how* to explain it to the child.
        - Provide specific questions to ask the child to spark their thinking (e.g., "Why do you think this formula applies here?").
 
-    3. **📚 Essential Vocabulary**
+    3. **📚 Essential Vocabulary (Table Format)**
        - [Word in Homework Language] | [Meaning in {parent_lang}] | [Pronunciation]
 
     4. **💖 Praise the Hero (The Magic Moment)**
