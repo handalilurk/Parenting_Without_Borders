@@ -24,46 +24,51 @@ st.set_page_config(
 )
 
 # ==========================================
-# [AI Function] - 프롬프트 대폭 강화
+# [AI Function] - 문제 해결 능력 대폭 강화
 # ==========================================
 def get_gemini_response(image, parent_lang, homework_lang):
     prompt = f"""
     ### Role & Objective
     You are the **Lead AI Tutor** for the app "Super Parents".
-    Your goal is to empower a parent who speaks **[ {parent_lang} ]** to perfectly understand and guide their child's homework (originally in **[ {homework_lang} ]**).
+    **Your #1 Priority is ACCURACY and CLARITY.** A parent, who speaks **[ {parent_lang} ]**, needs to understand this homework (originally in **[ {homework_lang} ]**) perfectly to teach their child.
 
-    ### Instructions
-    Analyze the provided homework image and generate a structured guide.
-    **The final output must be written entirely in {parent_lang} (except for the specific praise phrase for the child).**
+    ### 🔍 Analysis Instructions (CRITICAL)
+    1.  **Solve EVERY problem** visible in the image. Do not skip questions.
+    2.  If the image contains text/reading, summarize the content and explain the key points.
+    3.  If the image contains math, show the **step-by-step calculation process**, not just the final answer.
+    4.  **The final output must be written entirely in {parent_lang} (except for the praise phrase).**
 
-    ### Output Format
-    1. **🎯 Homework Overview (1-Sentence Summary)**
-       - Briefly explain what this homework is about in {parent_lang}.
+    ### Output Format (Strictly Follow This Order)
+    
+    1. **📝 Detailed Solution & Explanation (Key Section)**
+       - **This is the most important part.**
+       - Provide the correct answer for each question found in the image.
+       - Explain *WHY* that is the answer.
+       - If it is a math problem, break it down: "Step 1 -> Step 2 -> Answer".
+       - If there are multiple questions, number them (1, 2, 3...) clearly.
 
-    2. **🗣️ Coaching Guide (Conversational Scripts)**
-       - Provide specific questions the parent can ask the child to guide them (not just giving answers).
-       - Write in {parent_lang}.
+    2. **🗣️ Coaching Guide (How to Teach)**
+       - Now that the parent knows the answer, tell them *how* to explain it to the child.
+       - Provide specific questions to ask the child to spark their thinking (e.g., "Why do you think this formula applies here?").
 
-    3. **📝 Essential Vocabulary (Table Format)**
-       - Columns: [Word in Homework Language] | [Meaning in {parent_lang}] | [Pronunciation]
+    3. **📚 Essential Vocabulary**
+       - [Word in Homework Language] | [Meaning in {parent_lang}] | [Pronunciation]
 
-    4. **💡 Teacher's Pro Tip**
-       - A short tip to help the child solve the problem easily.
-
-    5. **💖 Praise the Hero (The Magic Moment)**
-       - **Crucial:** Provide a specific praise sentence in **the language of the homework** (so the child understands).
-       - The praise should be specific to the effort (e.g., "You worked really hard on these fractions!").
+    4. **💖 Praise the Hero (The Magic Moment)**
+       - Provide a specific praise sentence in **the language of the homework** (so the child understands).
        - **Format:**
          - 🗨️ **Say to Child:** "[Insert Praise in Homework Language]"
          - 🗣️ **Pronunciation:** "[Write how to say it using {parent_lang} alphabet]"
          - 🧠 **Meaning:** "[Meaning in {parent_lang}]"
 
     ### Tone & Style
-    - Professional, supportive, and encouraging.
-    - Use clear Markdown. Use Bold text for emphasis.
+    - **In Section 1 (Solution):** Precise, Logical, Academic yet easy to understand.
+    - **In Section 2 & 4 (Coaching/Praise):** Encouraging, Warm, Supportive.
+    - Use clear Markdown with bold text for answers.
     """
     try:
         model = genai.GenerativeModel(MODEL_NAME)
+        # 이미지 처리 방식은 리스트로 감싸는 것이 안전합니다.
         content_input = [prompt, image[0]] if isinstance(image, list) else [prompt, image]
         response = model.generate_content(content_input)
         return response.text
@@ -199,7 +204,7 @@ with st.container():
 
         if submit:
             status_text = st.empty()
-            status_text.info("🤖 AI is preparing your coaching guide...It May takes 30 seconds...")
+            status_text.info("🤖 AI is preparing your coaching guide...It may take 30 seconds...")
             
             p_lang_clean = parent_lang.split("(")[0].strip()
             response_text = get_gemini_response(image, p_lang_clean, target_lang)
