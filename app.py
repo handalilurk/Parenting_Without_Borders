@@ -11,20 +11,20 @@ else:
     try:
         API_KEY = st.secrets["GOOGLE_API_KEY"]
     except:
-        st.error("API 키를 찾을 수 없습니다.")
+        st.error("API 키를 찾을 수 없습니다. secrets.toml 파일을 확인해주세요.")
         st.stop()
 
 genai.configure(api_key=API_KEY)
-MODEL_NAME = "gemini-2.5-flash" 
+MODEL_NAME = "gemini-2.5-flash"
 
 st.set_page_config(
-    page_title="Super Parents: Heros Across Languages",
+    page_title="Super Parents: Heroes Across Languages",
     page_icon="🦸",
     layout="centered"
 )
 
 # ==========================================
-# [AI Function]
+# [AI Function] - 프롬프트 대폭 강화
 # ==========================================
 def get_gemini_response(image, parent_lang, homework_lang):
     prompt = f"""
@@ -34,17 +34,33 @@ def get_gemini_response(image, parent_lang, homework_lang):
 
     ### Instructions
     Analyze the provided homework image and generate a structured guide.
-    **The final output must be written entirely in {parent_lang}.**
+    **The final output must be written entirely in {parent_lang} (except for the specific praise phrase for the child).**
 
     ### Output Format
     1. **🎯 Homework Overview (1-Sentence Summary)**
+       - Briefly explain what this homework is about in {parent_lang}.
+
     2. **🗣️ Coaching Guide (Conversational Scripts)**
+       - Provide specific questions the parent can ask the child to guide them (not just giving answers).
+       - Write in {parent_lang}.
+
     3. **📝 Essential Vocabulary (Table Format)**
+       - Columns: [Word in Homework Language] | [Meaning in {parent_lang}] | [Pronunciation]
+
     4. **💡 Teacher's Pro Tip**
+       - A short tip to help the child solve the problem easily.
+
+    5. **💖 Praise the Hero (The Magic Moment)**
+       - **Crucial:** Provide a specific praise sentence in **the language of the homework** (so the child understands).
+       - The praise should be specific to the effort (e.g., "You worked really hard on these fractions!").
+       - **Format:**
+         - 🗨️ **Say to Child:** "[Insert Praise in Homework Language]"
+         - 🗣️ **Pronunciation:** "[Write how to say it using {parent_lang} alphabet]"
+         - 🧠 **Meaning:** "[Meaning in {parent_lang}]"
 
     ### Tone & Style
     - Professional, supportive, and encouraging.
-    - Use clear Markdown.
+    - Use clear Markdown. Use Bold text for emphasis.
     """
     try:
         model = genai.GenerativeModel(MODEL_NAME)
@@ -55,32 +71,28 @@ def get_gemini_response(image, parent_lang, homework_lang):
         return f"Error occurred during analysis: {e}"
 
 # ==========================================
-# 2. 테마 및 디자인 (절대 깨지지 않는 방식)
+# 2. 테마 및 디자인 (CSS)
 # ==========================================
 
 with st.sidebar:
     st.header("⚙️ Settings")
     theme_mode = st.selectbox("Theme Mode", ["Light Mode (Default)", "Dark Mode"])
     st.divider()
-    st.markdown("Developed with Google Gemini")
+    st.markdown("Developed with Google Gemini 2.5 Flash")
 
 if "Dark" in theme_mode:
     bg_color = "#0E1117"
     text_color = "#FAFAFA"
     card_bg = "#262730"
     border_color = "#374151"
-    header_bg = "#312E81" 
+    header_bg = "#312E81"
 else:
     bg_color = "#F3F4F6"
     text_color = "#1F2937"
     card_bg = "#FFFFFF"
     border_color = "#E5E7EB"
-    header_bg = "#4F46E5" 
+    header_bg = "#4F46E5"
 
-# ------------------------------------------------------------------
-# [수정 핵심] HTML 변수를 들여쓰기 없이 왼쪽 끝에 붙여서 정의
-# 코드가 조금 못생겨 보여도, 이렇게 해야 화면에 코드가 노출되지 않습니다.
-# ------------------------------------------------------------------
 header_html = f"""
 <style>
     .stApp {{ background-color: {bg_color} !important; }}
@@ -115,14 +127,15 @@ header_html = f"""
         background-color: {card_bg}; text-align: center;
     }}
     .result-box {{
-        background-color: {card_bg}; padding: 20px; border-radius: 12px;
+        background-color: {card_bg}; padding: 25px; border-radius: 12px;
         border: 1px solid {border_color};
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     }}
 </style>
 
 <div class="custom-header">
     <div style="font-size: 3rem; margin-bottom: 10px;">🦸‍♂️ ♡ 🦸‍♀️</div>
-    <h1>Super Parents<br>Heros Across<br> Languages</h1>
+    <h1>Super Parents<br>Heroes Across<br> Languages</h1>
     <p style="margin-bottom: 10px;">
         <span class="gold-text">No barrier beats a parent’s love.</span>
     </p>
@@ -186,7 +199,7 @@ with st.container():
 
         if submit:
             status_text = st.empty()
-            status_text.info("🤖 AI is preparing your coaching guide...")
+            status_text.info("🤖 AI is preparing your coaching guide...It May takes 30 seconds...")
             
             p_lang_clean = parent_lang.split("(")[0].strip()
             response_text = get_gemini_response(image, p_lang_clean, target_lang)
@@ -197,6 +210,8 @@ with st.container():
             else:
                 status_text.success("✅ Ready to teach!")
                 st.markdown("### 🎉 Your Coaching Guide")
+                
+                # 결과 박스 표시
                 st.markdown(f'<div class="result-box">{response_text}</div>', unsafe_allow_html=True)
                 
                 st.markdown("""
